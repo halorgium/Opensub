@@ -1,0 +1,72 @@
+#!/usr/bin/ruby
+
+lib_path = File.expand_path('../../', __FILE__)
+$:.unshift(lib_path)
+
+require 'opensub'
+require 'rubygems'
+require 'ruby-debug'
+require 'optparse'
+
+
+options = {
+  :language => 'eng',
+  :download_all => false,
+}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: opensub [options] filename"
+
+  opts.on("-a", "--all", "Download all matching subtitles") do
+    options[:download_all] = true
+  end
+  opts.on("-l", "--language [langcode]", "specify language code (eng, cze,...)") do |arg|
+    options[:language] = arg
+  end
+  opts.on_tail("-h", "--help", "Show help") do
+    puts opts
+    exit
+  end
+end.parse!
+
+class Subtitles
+  def initialize(opts)
+    @files = opts[:files]
+    @client = OpenSub::Connection.new(:language => opts[:language])
+    @download_all = opts[:download_all]
+  end
+
+  def download
+    @files.each do |fname|
+      all_subs = @client.search(:filename => fname)
+      if all_subs.empty?
+        $stderr.puts "skipping #{fname}: subtitles not found"
+        next
+      end
+
+      # download first subtitles w/o prefix
+      exec_download(all_subs.shift, fname, false)
+
+      # download other subtitles w/ prefix
+      if @download_all
+        all_subs.each do |subs|
+          download(subs, fname, false)
+        end
+      end
+    end
+  end
+
+  private
+
+  def exec_download(sub, vfile, include_suffix)
+    begin
+      sub_fname = sub.save(:video_filename => vfile, :include_suffix => include_suffix)
+      $stderr.puts "created file #{sub_fname}"
+    rescue
+      $stderr.puts "skipping #{fname}: #{$!}"
+    end
+  end
+end
+
+Subtitles.new(options.merge(:files => ARGV)).download
+

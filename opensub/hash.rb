@@ -1,4 +1,6 @@
 module OpenSub
+  # taken from
+  # http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes
   class Hasher
     def open_subtitles_hash(filename)
       raise "Need video filename" unless filename

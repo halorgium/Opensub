@@ -50,7 +50,7 @@ class Subtitles
       # download other subtitles w/ prefix
       if @download_all
         all_subs.each do |subs|
-          download(subs, fname, false)
+          exec_download(subs, fname, true)
         end
       end
     end

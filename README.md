@@ -1,0 +1,16 @@
+== Opensub
+
+The Opensub Ruby Client library is an open source library for opensubtitles.org
+API. It allows you to easily search and download subtitles from
+opensubtitles.org.
+
+
+== Usage
+
+    client = OpenSub::Connection.new(:language => 'cze')
+    if sub = client.search(:filename => fname)
+      sub.download(:filename => 'subtitles')
+    end
+
+    Or check bin/opensub script.
+

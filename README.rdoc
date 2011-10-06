@@ -8,7 +8,7 @@ opensubtitles.org.
 == Usage
 
     client = OpenSub::Connection.new(:language => 'cze')
-    if sub = client.search(:filename => fname)
+    if sub = client.first(:filename => fname)
       sub.download(:filename => 'subtitles')
     end
 
